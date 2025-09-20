@@ -16,7 +16,7 @@ const taskSchema = new mongoose.Schema(
     // },
     repeat: {
       type: String,
-      enum: ["once", "weekly", "monthly"],
+      enum: ["once", "daily", "weekly", "monthly", "yearly"],
       default: "once",
     },
 
