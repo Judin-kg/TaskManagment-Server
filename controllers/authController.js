@@ -138,13 +138,14 @@ console.log('Login Request:', req.body);
 exports.loginAdmin = async (req, res) => {
   try {
     const { email, password } = req.body;
-
+     console.log(password,"admin passwarddddddddd");
+     
     if (!email || !password) {
       return res.status(400).json({ message: 'Email and password are required' });
     }
 
     const user = await Staff.findOne({ email });
-
+   log("user detailsssssssssss:",user);
     if (!user || user.role !== 'admin') {
       return res.status(403).json({ message: 'Access denied. Admins only.' });
     }
