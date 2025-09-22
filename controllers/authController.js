@@ -179,25 +179,33 @@ exports.loginAdmin = async (req, res) => {
 };
 
 
+
+
+
+
 // Get all staff
 // exports.getAllStaff = async (req, res) => {
 //   try {
-//     const staff = await Staff.find().populate("assistantManager", "name");
-//     console.log(staff,"stafffffff");
-    
-//     res.json(staff);
+//     const staff = await Staff.find({ role: "staff" })
+//       .populate("assistantManager", "name email contactNumber role")
+//       .select("name email contactNumber role assistantManager status");
+
+//     console.log("Fetched staff list:", staff);
+
+//     res.status(200).json(staff);
 //   } catch (err) {
+//     console.error("Error fetching staff:", err);
 //     res.status(500).json({ message: "Error fetching staff", error: err.message });
 //   }
 // };
-// Get all staff
+
 exports.getAllStaff = async (req, res) => {
   try {
     const staff = await Staff.find({ role: "staff" })
       .populate("assistantManager", "name email contactNumber role")
-      .select("name email contactNumber role assistantManager status");
+      .select("name email contactNumber role assistantManager status password"); // ✅ Include password
 
-    console.log("Fetched staff list:", staff);
+    console.log("Fetched staff list with password:", staff);
 
     res.status(200).json(staff);
   } catch (err) {
