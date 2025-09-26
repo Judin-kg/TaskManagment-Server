@@ -173,32 +173,37 @@ exports.getAssistantManagers = async (req, res) => {
   }
 };
 
-// ✅ Login Assistant Manager
-// exports.loginAssistantManager = async (req, res) => {
-//   try {
-//     const { email, password } = req.body;
-//     const assistantManager = await Staff.findOne({ email });
+// ✅ Delete Assistant Manager
+exports.deleteAssistantManager = async (req, res) => {
+  try {
+    const { id } = req.params;
 
-//     if (!assistantManager) {
-//       return res.status(404).json({ error: "Assistant Manager not found" });
-//     }
+    const deletedAM = await Staff.findByIdAndDelete(id);
+    if (!deletedAM) {
+      return res.status(404).json({ error: "Assistant Manager not found" });
+    }
 
-//     const isMatch = await assistantManager.matchPassword(password);
-//     if (!isMatch) {
-//       return res.status(401).json({ error: "Invalid password" });
-//     }
+    res.status(200).json({ message: "Assistant Manager deleted successfully" });
+  } catch (err) {
+    console.error("Error deleting assistant manager:", err);
+    res.status(500).json({ error: "Failed to delete assistant manager" });
+  }
+};
 
-//     const token = generateToken(assistantManager._id);
-//     res.status(200).json({
-//       token,
-//       assistantManager: {
-//         id: assistantManager._id,
-//         email: assistantManager.email,
-//         name: assistantManager.name,
-//       },
-//     });
-//   } catch (err) {
-//     console.error("Assistant Manager login error:", err);
-//     res.status(500).json({ error: "Server error" });
-//   }
-// };
+// ✅ Delete Assistant Manager
+exports.deleteAssistantManager = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const deletedAM = await Staff.findByIdAndDelete(id);
+    if (!deletedAM) {
+      return res.status(404).json({ error: "Assistant Manager not found" });
+    }
+
+    res.status(200).json({ message: "Assistant Manager deleted successfully" });
+  } catch (err) {
+    console.error("Error deleting assistant manager:", err);
+    res.status(500).json({ error: "Failed to delete assistant manager" });
+  }
+};
+
