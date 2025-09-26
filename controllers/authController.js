@@ -214,3 +214,21 @@ exports.getAllStaff = async (req, res) => {
     res.status(500).json({ message: "Error fetching staff", error: err.message });
   }
 };
+
+// ✅ Delete Staff
+exports.deleteStaff = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const deletedStaff = await Staff.findByIdAndDelete(id);
+    if (!deletedStaff) {
+      return res.status(404).json({ message: "Staff member not found" });
+    }
+
+    res.status(200).json({ message: "Staff member deleted successfully" });
+  } catch (err) {
+    console.error("Error deleting staff:", err);
+    res.status(500).json({ message: "Error deleting staff" });
+  }
+};
+
