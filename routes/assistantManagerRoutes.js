@@ -9,5 +9,5 @@ router.post("/", assistantManagerController.createAssistantManager);
 router.get("/", assistantManagerController.getAssistantManagers);
 router.post("/login",assistantManagerController.loginAssistantManager);
 router.delete("/:id", assistantManagerController.deleteAssistantManager); // ✅ add delete route
-
+router.put("/:id/reset-password",assistantManagerController.resetAssistantManagerPassword);
 module.exports = router;

@@ -95,6 +95,7 @@
 
 
 const Staff = require("../models/User");
+// const Manager = require("../models/Manager");
 const jwt = require("jsonwebtoken");
 
 // Generate JWT
@@ -195,8 +196,15 @@ exports.createManager = async (req, res) => {
   try {
     const { name, email, password, contactNumber, departmentId } = req.body;
   
+      if (!name || !email || !password) {
+      return res.status(400).json({ error: "name, email and password are required" });
+    }
 
     console.log(req.body,"manageeeeeeeeer");
+
+    // check existing
+    const existing = await Staff.findOne({ email });
+    if (existing) return res.status(409).json({ error: "Email already in use" });
     
     // Ensure role is always "manager"
     const manager = new Staff({
@@ -209,7 +217,11 @@ exports.createManager = async (req, res) => {
     });
 
     await manager.save();
-    res.status(201).json(manager);
+
+     const managerObj = manager.toObject();
+    delete managerObj.password; // don't return password
+    res.status(201).json(managerObj);
+    // res.status(201).json(manager);
   } catch (err) {
     console.error("Error creating manager:", err);
     res.status(500).json({ error: "Failed to create manager" });
@@ -217,11 +229,23 @@ exports.createManager = async (req, res) => {
 };
 
 // ✅ Get all Managers (with Department populated)
+// exports.getManagers = async (req, res) => {
+//   try {
+//     const managers = await Staff.find({ role: "manager" })
+//       .populate("departmentId", "name")
+//       .select("name email contactNumber departmentId role status");
+
+//     res.json(managers);
+//   } catch (err) {
+//     console.error("Error fetching managers:", err);
+//     res.status(500).json({ error: "Failed to fetch managers" });
+//   }
+// };
 exports.getManagers = async (req, res) => {
   try {
     const managers = await Staff.find({ role: "manager" })
       .populate("departmentId", "name")
-      .select("name email contactNumber departmentId role status");
+      .select("name email contactNumber departmentId role status password"); // ✅ Include password too
 
     res.json(managers);
   } catch (err) {
@@ -229,6 +253,7 @@ exports.getManagers = async (req, res) => {
     res.status(500).json({ error: "Failed to fetch managers" });
   }
 };
+
 
 // ✅ Get Managers by Department
 exports.getManagersByDepartment = async (req, res) => {
@@ -280,3 +305,32 @@ exports.updateManager = async (req, res) => {
   }
 };
 
+// controllers/managerController.js
+exports.resetManagerPassword = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { newPassword } = req.body;
+
+    if (!newPassword) {
+      return res.status(400).json({ error: "New password is required" });
+    }
+
+    // 🔑 Hash the password before saving
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+    const updatedManager = await Staff.findByIdAndUpdate(
+      id,
+      { password: hashedPassword },
+      { new: true }
+    );
+
+    if (!updatedManager) {
+      return res.status(404).json({ error: "Manager not found" });
+    }
+
+    res.json({ message: "Password reset successfully" });
+  } catch (err) {
+    console.error("Error resetting manager password:", err);
+    res.status(500).json({ error: "Failed to reset password" });
+  }
+};

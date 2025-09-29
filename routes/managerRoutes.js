@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const { getManagers, createManager,getManagersByDepartment,loginManager,deleteManager} = require("../controllers/managerController");
+const { getManagers, createManager,getManagersByDepartment,loginManager,deleteManager,resetManagerPassword} = require("../controllers/managerController");
 
 // GET all managers
 router.get("/", getManagers);
@@ -11,5 +11,6 @@ router.post("/login", loginManager);
 router.delete("/:id", deleteManager);
 // Get Managers by Department (optional filter)
 router.get("/department/:departmentId",getManagersByDepartment);
-
+// 🔑 Reset password route
+router.put("/:id/reset-password", resetManagerPassword);
 module.exports = router;

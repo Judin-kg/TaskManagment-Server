@@ -95,17 +95,22 @@ const nodemailer = require("nodemailer");
 
 exports.createTask = async (req, res) => {
   try {
-    const { taskName, description, scheduledTime, role, assignedTo, assignedBy, status,repeat } = req.body;
+    const { taskName, description, scheduledTime, role, assignedTo, assignedBy, status,repeat, company } = req.body;
 
     if (!assignedBy) {
       return res.status(400).json({ error: "assignedBy is required" });
     }
+   if (!company || !company.id || !company.name) {
+      return res.status(400).json({ error: "company id and name are required" });
+    }
+
  // ✅ 1. Check if a similar task already exists
     const existingTask = await Task.findOne({
       taskName,
       assignedTo,
       scheduledTime,
       role,
+      
     });
 
     if (existingTask) {
@@ -124,6 +129,8 @@ exports.createTask = async (req, res) => {
       role,
       assignedTo,
       assignedBy,
+       company: { id: company.id, name: company.name }, // ✅ Save both id + name
+      
       status: status || "pending",
       repeat: repeat || "once",
 
@@ -135,9 +142,19 @@ exports.createTask = async (req, res) => {
     const populatedTask = await task.populate([
       { path: "assignedTo", select: "name email" },
       { path: "assignedBy", select: "name email" },
+     
     ]);
 
     console.log(populatedTask, "✅ Task Created & Populated");
+     console.log(populatedTask, "✅ Task Created & Populated");
+
+    // ✅ Convert populatedTask to a plain object
+    const taskResponse = populatedTask.toObject();
+
+    // ✅ Replace `company` object with just company name
+    // taskResponse.company = populatedTask.company?.name || null;
+
+    // ✅ Send email notification if user exists
 
     // ✅ 3. Fetch assigned user email
     const user = await Staff.findById(assignedTo).select("name email");
@@ -218,6 +235,37 @@ exports.getTaskReports = async (req, res) => {
     res.status(500).json({ error: "Failed to fetch task reports" });
   }
 };
+
+// Get all tasks with assignedTo, assignedBy, and company name
+// exports.getTasks = async (req, res) => {
+//   try {
+//     // Fetch all tasks and populate references
+//     const tasks = await Task.find()
+//       .populate({ path: "assignedTo", select: "name email" })
+//       .populate({ path: "assignedBy", select: "name email" })
+//       .populate({ path: "company", select: "name" })
+//       .sort({ createdAt: -1 }); // optional: latest first
+
+//       console.log(tasks,"tasksssssssssssssssssssssssssssgetalll");
+//     // Transform tasks: replace company object with company name
+//     const transformedTasks = tasks.map(task => {
+//       const t = task.toObject();
+//       t.company = task.company?.name || null;
+//       return t;
+//     });
+
+//     console.log (transformedTasks, "✅ Transformed Tasks with Company Names");
+
+//     res.status(200).json({
+//       success: true,
+//       totalTasks: transformedTasks.length,
+//       tasks: transformedTasks,
+//     });
+//   } catch (err) {
+//     console.error("❌ Error fetching tasks:", err);
+//     res.status(500).json({ error: "Failed to fetch tasks" });
+//   }
+// };
 
 
 

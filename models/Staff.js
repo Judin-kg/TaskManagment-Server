@@ -11,7 +11,7 @@ const staffSchema = new mongoose.Schema(
     },
     contactNumber: { type: String, required: true },
     email: { type: String, required: true, unique: true },
-    password: { type: String, required: true },
+    password: { type: String, required: true , select: true },
     role: { type: String, default: "staff" },
   },
   { timestamps: true }

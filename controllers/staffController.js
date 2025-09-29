@@ -1,6 +1,6 @@
 const Staff = require("../models/Staff");
 const jwt = require("jsonwebtoken");
-
+ const bcrypt = require("bcryptjs");
 // Generate JWT
 const generateToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET || 'mysecretkey',{ expiresIn: "7d" });
@@ -67,5 +67,33 @@ exports.getAllStaff = async (req, res) => {
     res.json(staff);
   } catch (err) {
     res.status(500).json({ message: "Error fetching staff", error: err.message });
+  }
+};
+
+exports.resetStaffPassword = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { newPassword } = req.body;
+
+    if (!newPassword) {
+      return res.status(400).json({ message: "New password is required" });
+    }
+
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+    const updatedStaff = await Staff.findByIdAndUpdate(
+      id,
+      { password: hashedPassword },
+      { new: true }
+    );
+
+    if (!updatedStaff) {
+      return res.status(404).json({ message: "Staff not found" });
+    }
+
+    res.json({ message: "Password reset successfully" });
+  } catch (err) {
+    console.error("Error resetting staff password:", err);
+    res.status(500).json({ message: "Failed to reset password", error: err.message });
   }
 };

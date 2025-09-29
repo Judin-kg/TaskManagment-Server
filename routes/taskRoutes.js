@@ -9,7 +9,7 @@ router.get("/reports",taskController.getTaskReports);
 router.post("/", taskController.createTask);
 
 // Get all tasks
-router.get("/", taskController.getTasks);
+router.get("/tasks", taskController.getTasks);
 
 // Get single task
 router.get("/:id", taskController.getTaskById);

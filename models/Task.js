@@ -14,6 +14,14 @@ const taskSchema = new mongoose.Schema(
     //   ref: "Company", // ✅ reference to company
     //   required: true,
     // },
+    // company: { type: mongoose.Schema.Types.ObjectId, ref: "Company", required: true }, // ✅ NEW FIELD
+
+     // ✅ Add company object with id + name
+    company: {
+      id: { type: mongoose.Schema.Types.ObjectId, ref: "Company", required: true },
+      name: { type: String, required: true },
+    },
+    
     repeat: {
       type: String,
       enum: ["once", "daily", "weekly", "monthly", "yearly"],
