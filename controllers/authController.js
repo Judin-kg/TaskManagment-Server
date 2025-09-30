@@ -82,36 +82,92 @@ exports.signup = async (req, res) => {
 // @route   POST /api/auth/login
 // ==========================
 
+// exports.loginUser = async (req, res) => {
+//   try {
+//     const { email, password } = req.body;
+// console.log('Login Request:', req.body);
+
+
+//     if (!email || !password) {
+//       return res.status(400).json({ message: 'Email and password are required' });
+//     }
+
+//     const user = await Staff.findOne({ email });
+//     console.log("user details:",user);
+//     if (!user) {
+//       console.log('User not found');
+//       return res.status(400).json({ message: 'Invalid email or password' });
+//     }
+
+//     if (user.status === 'blocked') {
+//        console.log('Password mismatch');
+//       return res.status(403).json({ message: 'Your account has been blocked by admin.' });
+//     }
+
+//     const isMatch = await bcrypt.compare(password, user.password);
+//     console.log(password,"passward");
+//     console.log(user.password,"db");
+    
+//     console.log(isMatch,"ismatch");
+    
+//     if (!isMatch) {
+//       return res.status(400).json({ message: 'Invalid email or password' });
+//     }
+
+//     const token = generateToken(user._id);
+
+//     res.status(200).json({
+//       token,
+//       user: {
+//         id: user._id,
+//         name: user.name,
+//         email: user.email,
+//         role: user.role,
+//         status: user.status,
+//       },
+//     });
+//   } catch (err) {
+//     console.error('Login Error:', err);
+//     res.status(500).json({ message: 'Server error during login' });
+//   }
+// };
+
+
 exports.loginUser = async (req, res) => {
   try {
     const { email, password } = req.body;
-console.log('Login Request:', req.body);
-
+    console.log("Login Request:", req.body);
 
     if (!email || !password) {
-      return res.status(400).json({ message: 'Email and password are required' });
+      return res.status(400).json({ message: "Email and password are required" });
     }
 
     const user = await Staff.findOne({ email });
-    console.log("user details:",user);
+    console.log("user details:", user);
+
     if (!user) {
-      console.log('User not found');
-      return res.status(400).json({ message: 'Invalid email or password' });
+      console.log("User not found");
+      return res.status(400).json({ message: "Invalid email or password" });
     }
 
-    if (user.status === 'blocked') {
-       console.log('Password mismatch');
-      return res.status(403).json({ message: 'Your account has been blocked by admin.' });
+    // ✅ Allow only staff role
+    if (user.role !== "staff") {
+      return res.status(403).json({ message: "Access denied. Staff only." });
+    }
+
+    if (user.status === "blocked") {
+      return res
+        .status(403)
+        .json({ message: "Your account has been blocked by admin." });
     }
 
     const isMatch = await bcrypt.compare(password, user.password);
-    console.log(password,"passward");
-    console.log(user.password,"db");
-    
-    console.log(isMatch,"ismatch");
-    
+    console.log(password, "entered password");
+    console.log(user.password, "db password hash");
+    console.log(isMatch, "isMatch");
+
     if (!isMatch) {
-      return res.status(400).json({ message: 'Invalid email or password' });
+      return res.status(400).json({ message: "Invalid email or password" });
     }
 
     const token = generateToken(user._id);
@@ -127,10 +183,11 @@ console.log('Login Request:', req.body);
       },
     });
   } catch (err) {
-    console.error('Login Error:', err);
-    res.status(500).json({ message: 'Server error during login' });
+    console.error("Login Error:", err);
+    res.status(500).json({ message: "Server error during login" });
   }
 };
+
 
 
 
