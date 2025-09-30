@@ -1,4 +1,4 @@
-const Staff = require("./models/User");
+const Staff = require("./models/Staff");
 
 async function seedAdmin() {
   try {
