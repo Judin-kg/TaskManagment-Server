@@ -140,7 +140,7 @@ exports.createTask = async (req, res) => {
 
     // ✅ 2. Populate assignedTo & assignedBy
     const populatedTask = await task.populate([
-      { path: "assignedTo", select: "name email" },
+      { path: "assignedTo", select: "name email contactNumber" },
       { path: "assignedBy", select: "name email" },
      
     ]);
